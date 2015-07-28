@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+
+    <title>Meetup.js | An introduction to Generators</title>
+    <meta content="Meetup.js | An introduction to Generators" name=
+    "description">
+    <meta content="Diego Calderón" name="author">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black-translucent" name=
+    "apple-mobile-web-app-status-bar-style">
+    <meta content=
+    "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui"
+    name="viewport">
+    <link href="css/reveal.css" rel="stylesheet">
+    <link href="css/theme/codecultist.css" id="theme" rel="stylesheet">
+    <link href="css/custom.css" id="theme" rel="stylesheet">
+    <!-- Code syntax highlighting -->
+    <link href="lib/css/hybrid.css" rel="stylesheet">
+    <!-- Printing and PDF exports -->
+
+    <script>
+var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script><!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+</head>
+
+<body>
+    <div class="reveal">
+        <!-- Any section element inside of this container is displayed as a slide -->
+        <div class="slides">
+            <section>
+                <h1>Meetup.js</h1>
+                <h2>An introduction to Generators</h2>
+            </section>
+
+            <section>
+                <h2>Hi, I'm Diego Calderón</h2>
+                <p>and we gonna talk about <strong>generators</strong><br/>in <strike>ES6</strike> EcmaScript2015.</p>
+                <p>So let’s start…</p>
+            </section>
+
+            <section>
+                <h2>JS’ run-to-completion behaviour</h2>
+            </section>
+
+            <section>
+                <p>JavaScript is <a target="_blank" href="http://codekult.github.io/tgif-es6-promises/#/1">single threaded</a>.</p>
+                <p>And have what is called a <em>run-to-completion</em> behavior.</p>
+            </section>
+
+            <section data-background="#ffffff">
+                <p><img src="images/event_loop.png" /></p>
+            </section>
+
+            <section>
+                <p>Or in a more figurative way… </p>
+            </section>
+
+            <section data-background="#ffffff">
+                <p><img src="images/dog_with_bone.jpg" /></p>
+            </section>
+
+            <section>
+                <p>But there is a new kid on the block:</p>
+            </section>
+
+            <section data-background="images/break_hulk.jpg">
+                <h2 style="font-family: 'Bangers', cursive;font-style:normal;font-size:4em;letter-spacing:15px;color:yellow; text-shadow: 1px 1px 0 black, 3px 3px .5em lime;text-transform:uppercase;">Generators</h2>
+            </section>
+
+            <section>
+                <p><strong>Generators</strong> are a new type of function which can be paused and resumed. Breaking the run-to-completion behavior.</p>
+            </section>
+
+            <section>
+                <h3>Can we use generators right now?</h3>
+            </section>
+
+            <section>
+                <p><img src="images/support.png" /></p>
+                <p><small><a target="_blank" href="http://kangax.github.io/compat-table/es6/#generators">http://kangax.github.io/compat-table/es6/#generators</a></small></p>
+            </section>
+
+            <section data-background="#000000">
+                <p style="font-style:italic;">There are some features money can’t buy.</p>
+                <p style="font-style:italic;">For everything else there’s <a target="_blank" href="https://babeljs.io/repl/#?experimental=true&evaluate=true&loose=false&spec=false&code=function*%20myGen()%7B%0A%20%20yield%3B%0A%20%20console.log('Hi%20I%20am%20a%20generator')%3B%0A%7D">Babel</a>.</p>
+                <p><img src="images/masterwhat.png" /></p>
+            </section>
+
+            <section>
+                <h2>Show me the syntax</h2>
+            </section>
+
+            <section>
+                <p>Generators are declared as regular functions but in the following manner:</p>
+
+<pre><code>function* myGen() { ... }
+// Or the same `function *myGen() { ... }`
+</code></pre>
+            </section>
+
+            <section>
+                <p>We can argue about how to write a generator signature, but only when we finished the <em>tabs vs spaces</em> talk.</p>
+            </section>
+
+            <section>
+                <p>Also the <code>yield</code> keyword is introduced, and we’ll use as a mark for pause/restart the generator and as a way to send and receive data.</p>
+            </section>
+
+            <section>
+<pre><code>function *myGen() {
+   console.log(&#39;Hi&#39;);
+   yield;
+   console.log(&#39;Bye&#39;);
+}
+
+var objGen = myGen();
+objGen.next(); // &#39;Hi&#39;
+objGen.next(); // &#39;Bye&#39;
+</code></pre>
+            </section>
+
+            <section>
+                <h3>Error handling</h3>
+            </section>
+
+            <section>
+                <p>A benefit of generators is its synchronous like semantics, so we can use ol’ <code>try { ... } catch (err) {}</code> to handle errors.</p>
+            </section>
+
+            <section>
+<pre><code>function *myGen () {
+     try {
+         yield;
+         console.log(&#39;Hola&#39;.toUpperCase());
+     } catch (err) {
+         console.error(err);
+     }
+ }
+
+ var objGen = myGen();
+ objGen.next();
+ objGen.next();
+</code></pre>
+                <p><small><a target="_blank" href="http://www.es6fiddle.net/icmopyso/">Online example</a></small></p>
+            </section>
+
+            <section>
+                <h3>Delegate generators</h3>
+            </section>
+
+            <section>
+                <p>We can include a generator inside another generator using a <code>yield</code> variation: <code>yield*</code>. The nesting levels are infinite.</p>
+            </section>
+
+            <section>
+<pre><code>function *innerGen() {
+    yield console.log(2);
+    yield console.log(3);
+    yield console.log(4);
+}
+
+function *outerGen() {
+    yield console.log(1);
+    yield* insideGen();
+    // Or the same yield *insideGen();
+    yield console.log(5);
+}
+</code></pre>
+                <p><small><a target="_blank" href="http://www.es6fiddle.net/icmowyfi/">Online example</a></small></p>
+            </section>
+
+            <section>
+                <h2>Understanding iterators and iterables</h2>
+            </section>
+
+            <section>
+                <p>Every time we’re using a generator like this:</p>
+
+<pre><code>// Given a ´myGen´ generator function
+var objGen = myGen();
+</code></pre>
+            </section>
+
+            <section>
+                <p>We’re creating an iterator object, which we assign to the variable <code>objGen</code>, to control <code>*myGen()</code> generator.</p>
+            </section>
+
+            <section>
+                <p>We can use the <code>iterable</code> interface to control the iterator, which counts with methods as <code>next()</code>, <code>return()</code> or <code>throw()</code>.</p>
+            </section>
+
+            <section>
+                <p>Another benefits of <code>iterables</code> is that them can be consumed by data consumers as <code>for…of</code> loops, the <code>spread</code> operator and can be used in array destructuring.</p>
+            </section>
+
+            <section>
+                <p>In ES6 some iterable data sources are:</p>
+
+                <ul>
+                	<li>Arrays.</li>
+                	<li class="fragment">Strings.</li>
+                	<li class="fragment"><a target="_blank" href="http://www.2ality.com/2015/01/es6-maps-sets.html">Maps and Sets</a>.</li>
+                </ul>
+            </section>
+
+            <section>
+                <p>Calling <code>.next</code> on an iterable gives us an object containing a value, or an indication that there are no further values.</p>
+            </section>
+
+            <section>
+<pre><code>var myArr = [1,2,3],
+    myArrIt = myArr[Symbol.iterator]();
+
+myArrIt.next(); // Object {value: 1, done: false}
+myArrIt.next(); // Object {value: 2, done: false}
+myArrIt.next(); // Object {value: 3, done: false}
+myArrIt.next(); // Object {value: undefined, done: true}
+</code></pre>
+            </section>
+
+            <section>
+                <p>More on the iteration protocol:</p>
+
+                <ul>
+                	<li><a target="_blank" href="https://developer.mozilla.org/en/docs/Web/JavaScript/reference/Iteration_protocols">MDN Iterarion protocol</a>.</li>
+                	<li><a target="_blank" href="http://www.2ality.com/2013/06/iterators-generators.html">Iterators and iterables</a>.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Generator’s roles</h2>
+            </section>
+
+            <section data-background="images/roles.jpg">
+            </section>
+
+            <section>
+                <h3>Generators as data producers</h3>
+            </section>
+
+            <section>
+                <p>Each <code>yield</code> can return a value via <code>next()</code>.</p>
+                <p>Which means that generators can produce sequences of values via loops and recursion.</p>
+            </section>
+
+            <section>
+                <h4>Return values with <code>yield</code></h4>
+                <p><code>yield</code> can return a value to the generator caller.</p>
+            </section>
+
+            <section>
+<pre><code>function *myGen (x) {
+    var single = yield x,
+        double = yield (x * 2),
+        triple = yield (x * 3);
+}
+
+var objGen = myGen(4);
+console.log(objGen.next().value); // 4
+console.log(objGen.next().value); // 8
+console.log(objGen.next().value); // 12
+</code></pre>
+
+                <p><small><a target="_blank" href="http://www.es6fiddle.net/ia8bn1bo/">Online Example</a></small></p>
+            </section>
+
+            <section>
+                <h4>Using <code>return</code> inside generators</h4>
+                <p>We can achieve the later example using <code>return</code>.</p>
+            </section>
+
+            <section>
+<pre><code>function *myGen (x) {
+    var single = yield x,
+        double = yield (x * 2),
+        triple = x * 3;
+    return triple;
+}
+
+var objGen = myGen(4);
+console.log(objGen.next().value); // 4
+console.log(objGen.next().value); // 8
+console.log(objGen.next().value); // 12
+</code></pre>
+
+                <p><small><a target="_blank" href="http://www.es6fiddle.net/ia8c6nn2/">Online example</a></small></p>
+            </section>
+
+            <section>
+                <p>Also we can use <code>return</code> with delegated generators.</p>
+
+                <p>Let’s see an <a target="_blank" href="http://www.es6fiddle.net/ia8cc6ly/">Online example</a></p>
+            </section>
+
+            <section>
+                <h4>Cycling through generators</h4>
+            </section>
+
+            <section>
+                <p>Given a generator as the following:</p>
+
+<pre><code>function *myGen() {
+    yield 1;
+    yield 2;
+    yield 3;
+}
+</code></pre>
+            </section>
+
+            <section>
+                <p>Using <code>for…of</code> loops:</p>
+
+<pre><code>for (let n of myGen()) {
+    console.log(n); // 1, 2, 3
+}
+</code></pre>
+                <p><small><a target="_blank" href="http://www.es6fiddle.net/icmqbcyj/">Online example</a></small></p>
+            </section>
+
+            <section>
+                <p>Using <code>spread</code> operator:</p>
+
+<pre><code>let myArr = [...myGen()]; // [1,2,3]
+</code></pre>
+                <p><small><a target="_blank" href="http://www.es6fiddle.net/icmqbcyj/">Online example</a></small></p>
+            </section>
+
+            <section>
+                <p>Destructuring :</p>
+
+<pre><code>let [a,b, ...rest] = myGen(); // [1,2,3]
+</code></pre>
+
+                <p><small><a target="_blank" href="http://www.es6fiddle.net/icmqbcyj/">Online example</a></small></p>
+            </section>
+
+            <section>
+                <h3>Generators as data consumers</h3>
+            </section>
+
+            <section>
+                <p><code>yield</code> can also receive a value from <code>next()</code>.</p>
+
+                <p>That means that generator become a data consumer that pause itself until a new value is pushed into it.</p>
+            </section>
+
+            <section>
+                <p>There are three ways of sending data to the generator: via <code>next()</code>, <code>return()</code>, or <code>throw()</code>.</p>
+            </section>
+
+            <section>
+                <p>Sending data via <code>next()</code>:</p>
+
+<pre><code>function *myGen() {
+    console.log(&#39;Started…&#39;);
+    var double = (yield) * 2,
+        triple = (yield) * 3;
+    console.log(double);
+    console.log(triple);
+}
+
+var objGen = myGen();
+objGen.next(); // Start generator
+objGen.next(5); // 10
+objGen.next(3); // 9
+</code></pre>
+            </section>
+
+            <section>
+                <p>Terminating the generator via <code>return()</code>:</p>
+
+<pre><code>function *myGen() {
+    console.log(&#39;Started…&#39;);
+    yield; // Inserts a `return` at this point
+    console.log(&#39;Never gets here&#39;);
+}
+
+var objGen = myGen();
+objGen.next();
+console.log(objGen.return(&#39;…This is the end.&#39;).value);
+</code></pre>
+
+                <p><small><a target="_blank" href="http://www.es6fiddle.net/ia8fie5t/">Online example</a></small></p>
+            </section>
+
+            <section>
+                <p>Throwing errors via <code>throw()</code>:</p>
+
+<pre><code>function *myGen() {
+    try {
+        console.log(&#39;Started…&#39;);
+        yield; // Throws error at this point
+        console.log(&#39;Never gets here&#39;);
+    } catch (err) {
+        console.error(`Error: ${err}`);
+    }
+}
+
+var objGen = myGen();
+objGen.next();
+objGen.throw(&#39;An error ocurred&#39;);
+</code></pre>
+
+                <p><small><a target="_blank" href="http://www.es6fiddle.net/ia8fo0zt/">Online example</a></small></p>
+            </section>
+
+            <section>
+                <h3>Generators as data producers/consumers</h3>
+            </section>
+
+            <section>
+                <p>We’ve seen how generators can act as data producers or consumers.</p>
+            </section>
+
+            <section>
+                <p>Now we can apply these behaviours in a combined way to create new patterns, as cooperative tasks, mimic <em>coroutines</em> or applying complex techniques as <em>CSP</em>.</p>
+            </section>
+
+            <section>
+                <p>Also we can apply this pattern to asynchronous operations to get the maximun benefit from generators capabilities.</p>
+            </section>
+
+            <section data-background="images/fight.jpg">
+                <h2 style="font-family: 'Bangers', cursive;font-style:normal;font-size:2.5em;letter-spacing:10px; line-height:1.2em; text-transform:uppercase;">Generators<br/>meet<br/>Promises</h2>
+            </section>
+
+            <section data-background="images/fight.jpg">
+                <p style="font-size:1.2em; text-shadow: 0 0 6px rgba(255,255,255,0.5);">We can use <code>yield</code> for waiting for a promise, and making that the promise itself resume the generator flow when it’s resolved.</p>
+            </section>
+
+            <section data-background="images/fight.jpg">
+                <p style="font-size:1.2em; text-shadow: 0 0 6px rgba(255,255,255,0.5);">This allow us to write more readable and maintenable code, which looks synchonous like, hiding away the async implementations.</p>
+            </section>
+
+            <section data-background="images/fight.jpg">
+                <p style="font-size:1.2em; text-shadow: 0 0 6px rgba(255,255,255,0.5);">Let’s see an <a target="_blank" href="https://github.com/codekult/generators-plus-promises/">example of this power</a>.</p>
+            </section>
+
+            <section>
+                <h2>The async future</h2>
+            </section>
+
+            <section>
+                <h3>Async functions</h3>
+            </section>
+
+            <section>
+                <p>The previous pattern is very useful.</p>
+                <p>And is included in the <strike>ES7</strike> EcmaScript2016 specification as <code>async</code> functions.</p>
+            </section>
+
+            <section>
+                <p>This new feature is merely sugar for the implementation that we saw earlier.</p>
+            </section>
+
+            <section>
+                <p>We can use an <code>async</code> function as follow:</p>
+
+<pre><code>async function() {
+    try {
+        let req = await request(http://someurl.com/getContent); // Promise aware function
+        // Do someting with `req`
+    } catch (err) {
+        console.error(err);
+    }
+}
+</code></pre>
+            </section>
+
+            <section>
+                <h3>push/async generators and observables</h3>
+            </section>
+
+            <section>
+                <p><strong>IMAGEN padre.png</strong> We got generator functions</p>
+            </section>
+
+            <section>
+                <p><strong>IMAGEN madre.png</strong> and async functions…</p>
+            </section>
+
+            <section>
+                <p><strong>IMAGEN hijo.png</strong> So we we can have <a target="_blank" href="https://github.com/jhusain/asyncgenerator">async generator</a> functions.</p>
+            </section>
+
+            <section>
+                <p>However, async generators has been<br/>deprecated in favor of <a target="_blank" href="https://github.com/zenparsing/es-observable">Observables</a>.</p>
+            </section>
+
+            <section>
+                <p>And we have an alternative but similar feature:
+                <br/><a target="_blank" href="https://github.com/jhusain/pushgenerator">push generators</a>.</p>
+            </section>
+
+            <section>
+                <p>Both push generators and observables are just proposals at the moment.</p>
+            </section>
+
+            <section>
+                <h2>Credits </h2>
+            </section>
+
+            <section>
+                <ul>
+                	<li><a target="_blank" href="http://www.2ality.com/2015/02/es6-iteration.html">Iterables and Iterators</a> and <a target="_blank" href="http://www.2ality.com/2015/03/es6-generators.html">ES6 Generators in depth</a> by @ rauschma.</li>
+                	<li><a target="_blank" href="http://jakearchibald.com/2014/iterators-gonna-iterate/">Iterators gonna iterate</a> by @ jaffathecake.</li>
+                	<li><a target="_blank" href="http://davidwalsh.name/es6-generators">ES6 Generators (serie)</a> and <a target="_blank" href="https://github.com/getify/You-Dont-Know-JS/blob/master/async%20&amp;%20performance/ch4.md">YDKJS: Async and Performance</a> by @getify.</li>
+                	<li><a target="_blank" href="https://www.youtube.com/watch?v=lil4YCCXRYc">Async Programming in ES7</a> by @jhusain.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Q&amp;A</h2>
+            </section>
+
+            <section>
+                <h2>Thanks!</h2>
+                <br/>
+                <p><a target="_blank" href="http://codekult.github.io/">codekult.github.io</a></p>
+                <p>Twitter: <a target="_blank" href="https://twitter.com/codekult">@codekult</a></p>
+            </section>
+        </div>
+    </div>
+    <script src="lib/js/head.min.js"></script> <script src="js/reveal.js"></script> <script>
+
+            // Full list of configuration options available at:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
+
+                transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+                // Optional reveal.js plugins
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+                    { src: 'plugin/notes/notes.js', async: true }
+                ]
+            });
+
+    </script>
+</body>
+</html>
