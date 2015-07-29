@@ -140,8 +140,9 @@ objGen.next(); // &#39;Bye&#39;
             <section>
 <pre><code>function *myGen () {
      try {
+         var number = 3;
          yield;
-         console.log(&#39;Hola&#39;.toUpperCase());
+         console.log(number.toUpperCase());
      } catch (err) {
          console.error(err);
      }
