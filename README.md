@@ -1,7 +1,9 @@
 ## Meetup.js
 ## An introduction to  Generators
 
-### Index
+https://codekult.github.io/meetup-js-generators/
+
+### Outline
 - JS’ run-to-completion behaviour.
 - Generators gonna break.
 - Can we use generators right now?
@@ -20,4 +22,3 @@
 	- `async` functions.
 	- push/async generator and Observable.
 - Credits.
-- Q&A.
