@@ -172,8 +172,8 @@ objGen.next(); // &#39;Bye&#39;
 
 function *outerGen() {
     yield console.log(1);
-    yield* insideGen();
-    // Or the same yield *insideGen();
+    yield* innerGen();
+    // Or the same yield *innerGen();
     yield console.log(5);
 }
 </code></pre>
